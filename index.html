@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fithub busca local — Norte de Bogotá</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root{
+    --cream:#F6F3EC;
+    --forest:#1F3B2C;
+    --orange:#E1602C;
+    --sage:#B7CBA8;
+    --charcoal:#242119;
+    --gold:#C99A3C;
+    --line:rgba(36,33,25,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--charcoal);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+  }
+  a{color:inherit;}
+  .sheet{
+    max-width:980px;
+    margin:0 auto;
+    background:var(--cream);
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:28px 32px 0 32px;
+  }
+  .wordmark{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:22px;
+    letter-spacing:0.2px;
+    color:var(--forest);
+  }
+  .wordmark span{color:var(--orange);}
+  .header-cta{
+    background:var(--forest);
+    color:var(--cream);
+    border:none;
+    padding:10px 18px;
+    border-radius:100px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+  }
+  .header-cta:hover{background:#16291D;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:52px 32px 36px 32px;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(34px,5.4vw,54px);
+    line-height:1.08;
+    margin:0 0 18px 0;
+    max-width:15ch;
+    color:var(--forest);
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--orange);
+  }
+  .hero p{
+    font-size:17px;
+    max-width:52ch;
+    margin:0;
+    color:#4A4638;
+  }
+
+  /* ---------- SPEC STRIP ---------- */
+  .specs{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    margin:0 32px;
+  }
+  .spec{
+    padding:22px 18px;
+    border-left:1px solid var(--line);
+  }
+  .spec:first-child{border-left:none;}
+  .spec .num{
+    font-family:'Fraunces',serif;
+    font-size:30px;
+    font-weight:500;
+    color:var(--forest);
+    display:block;
+  }
+  .spec .label{
+    font-size:12.5px;
+    color:#6b6656;
+    margin-top:4px;
+  }
+  .spec-note{
+    margin:12px 32px 0 32px;
+    font-size:13px;
+    color:#8a8570;
+    font-style:italic;
+  }
+
+  /* ---------- SECTION HEADS ---------- */
+  .section{
+    padding:44px 32px;
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:18px;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .section-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:26px;
+    margin:0;
+    color:var(--forest);
+  }
+  .section-head p{
+    margin:0;
+    font-size:14px;
+    color:#6b6656;
+    max-width:36ch;
+  }
+
+  /* ---------- MAP ---------- */
+  #map{
+    width:100%;
+    height:440px;
+    border-radius:10px;
+    border:1px solid var(--line);
+  }
+  .map-note{
+    margin-top:12px;
+    font-size:13px;
+    color:#6b6656;
+  }
+  .map-legend{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    margin-top:14px;
+    font-size:13px;
+    color:#4A4638;
+  }
+  .map-legend .item{display:flex;align-items:center;gap:8px;}
+  .swatch{width:13px;height:13px;border-radius:3px;display:inline-block;}
+
+  /* ---------- ZONE TABLE ---------- */
+  .zone-table{
+    width:100%;
+    border-collapse:collapse;
+    border-top:1px solid var(--line);
+  }
+  .zone-table th{
+    text-align:left;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:12px;
+    color:#6b6656;
+    padding:10px 14px 10px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .zone-table td{
+    padding:13px 14px 13px 0;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+    vertical-align:top;
+  }
+  .zone-table td:first-child{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:16px;
+    color:var(--forest);
+    white-space:nowrap;
+    width:1%;
+  }
+  .zone-table td:nth-child(2){
+    color:#6b6656;
+    white-space:nowrap;
+    width:1%;
+    padding-right:28px;
+  }
+  .zone-table td:last-child{
+    color:#4A4638;
+  }
+
+  /* ---------- TWO COLUMN LIST ---------- */
+  .cols{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:36px;
+  }
+  .col h3{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    color:var(--orange);
+    margin:0 0 12px 0;
+  }
+  .col ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .col li{
+    padding:11px 0;
+    border-top:1px solid var(--line);
+    font-size:15px;
+    color:var(--charcoal);
+  }
+  .col li:last-child{border-bottom:1px solid var(--line);}
+
+  /* ---------- CTA BAND ---------- */
+  .cta{
+    background:var(--forest);
+    color:var(--cream);
+    margin:0 32px 32px 32px;
+    border-radius:14px;
+    padding:36px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .cta-text h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:24px;
+    margin:0 0 8px 0;
+  }
+  .cta-text p{
+    margin:0;
+    font-size:14.5px;
+    color:#D8E3D3;
+    max-width:42ch;
+  }
+  .cta-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .contact-line{
+    font-size:14px;
+    color:#D8E3D3;
+  }
+  .contact-line strong{color:var(--cream);}
+  .whatsapp-btn{
+    background:var(--orange);
+    color:#fff;
+    border:none;
+    padding:13px 22px;
+    border-radius:100px;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .whatsapp-btn:hover{background:#C74F1F;}
+
+  footer{
+    text-align:center;
+    padding:0 32px 30px 32px;
+    font-size:12.5px;
+    color:#8a8570;
+  }
+
+  @media print{
+    .header-cta,.whatsapp-btn{display:none;}
+  }
+  @media (max-width:640px){
+    .specs{grid-template-columns:1fr 1fr;}
+    .spec:nth-child(3){border-left:none;}
+    .zone-table{font-size:13px;}
+    .zone-table th:nth-child(2), .zone-table td:nth-child(2){display:none;}
+    .cols{grid-template-columns:1fr;gap:8px;}
+    .cta{flex-direction:column;align-items:flex-start;}
+    header{padding:22px 20px 0 20px;}
+    .hero{padding:36px 20px 28px 20px;}
+    .specs{margin:0 20px;}
+    .spec-note{margin:12px 20px 0 20px;}
+    .section{padding:34px 20px;}
+    .cta{margin:0 20px 20px 20px;}
+    footer{padding:0 20px 24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <div class="wordmark">FIT<span>HUB</span></div>
+    <a class="header-cta" href="#contacto">Hablemos de tu local →</a>
+  </header>
+
+  <div class="hero">
+    <h1>Buscamos un local <em>en el norte de Bogotá</em></h1>
+    <p>Fithub, supermercado premium de comida saludable, está en expansión. Si administras o conoces un local en esta zona que encaje con lo que buscamos, queremos hablar contigo — la decisión la tomamos en máximo 48 horas.</p>
+  </div>
+
+  <div class="specs">
+    <div class="spec"><span class="num">50–70</span><span class="label">metros cuadrados</span></div>
+    <div class="spec"><span class="num">5–6</span><span class="label">estrato</span></div>
+    <div class="spec"><span class="num">20 kVA</span><span class="label">capacidad eléctrica</span></div>
+    <div class="spec"><span class="num">1º</span><span class="label">piso, solamente</span></div>
+  </div>
+  <p class="spec-note">Un plus si el local queda cerca de una droguería (Farmatodo), un supermercado premium (Carulla) o un gimnasio — ya es una señal de que ahí hay tráfico constante todos los días.</p>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Dónde lo buscamos</h2>
+      <p>El polígono marca la zona de búsqueda. Los puntos naranjas son barrios de interés y los verdes, nuestras tiendas activas.</p>
+    </div>
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="item"><span class="swatch" style="background:#C99A3C;"></span> Zona de búsqueda (Cl. 82 – Cl. 120, Cra. 11 – Cra. 19)</div>
+      <div class="item"><span class="swatch" style="background:#E1602C;border-radius:50%;"></span> Barrio de interés</div>
+      <div class="item"><span class="swatch" style="background:#1F3B2C;border-radius:2px;"></span> Tienda Fithub activa</div>
+    </div>
+    <p class="map-note">Zoom y desplázate libremente sobre el mapa — cada marcador tiene el detalle del sector o de la tienda.</p>
+  </div>
+
+  <div class="section" style="padding-top:0;">
+    <div class="section-head">
+      <h2>Zonas de interés</h2>
+      <p>De sur a norte, dentro del corredor Calle 82 – Calle 120.</p>
+    </div>
+    <table class="zone-table">
+      <thead>
+        <tr><th>Barrio</th><th>Ubicación aproximada</th><th>Por qué nos interesa</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Zona T</td><td>Cl. 82–85, entre Cra. 11 y 13</td><td>Alto flujo peatonal, epicentro gastronómico</td></tr>
+        <tr><td>El Nogal</td><td>Cl. 79–85, entre Cra. 11 y 15</td><td>Residencial consolidado, alto poder adquisitivo</td></tr>
+        <tr><td>Antiguo Country</td><td>Cl. 85–94, entre Cra. 15 y 19</td><td>Residencial exclusivo, cerca a oficinas y clubes</td></tr>
+        <tr><td>La Cabrera</td><td>Cl. 85–94, entre Cra. 11 y 15</td><td>Corredor comercial boutique, buen tráfico peatonal</td></tr>
+        <tr><td>Chicó</td><td>Cl. 90–97, entre Cra. 7 y 15</td><td>Corredor empresarial y retail premium</td></tr>
+        <tr><td>Chicó Norte</td><td>Cl. 97–100, entre Cra. 11 y 15</td><td>Extensión del Chicó, oficinas y locales boutique</td></tr>
+        <tr><td>Santa Paula</td><td>Cl. 100–108, entre Cra. 11 y 15</td><td>Residencial-comercial consolidado, cerca a clínicas y oficinas</td></tr>
+        <tr><td>Santa Ana Occidental</td><td>Cl. 108–116, entre Cra. 11 y 15</td><td>Mixto residencial-comercial, en crecimiento</td></tr>
+        <tr><td>San Patricio</td><td>Cl. 116–119, entre Cra. 15 y 19</td><td>Residencial tranquilo, cerca a colegios</td></tr>
+        <tr><td>Santa Bárbara</td><td>Cl. 116–120, entre Cra. 7 y 15</td><td>Vía arteria, alta visibilidad desde carro y a pie</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section" style="padding-top:0;">
+    <div class="section-head">
+      <h2>Lo que necesitamos</h2>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <h3>CARACTERÍSTICAS DEL LOCAL</h3>
+        <ul>
+          <li>Fachada amplia, con buen frente a la calle</li>
+          <li>Estrato 5 o 6</li>
+          <li>Alto flujo peatonal</li>
+          <li>Alta visibilidad</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>REQUISITOS TÉCNICOS</h3>
+        <ul>
+          <li>20 kVA de capacidad eléctrica</li>
+          <li>Uso de suelo comercial</li>
+          <li>Entre 50 y 70 m²</li>
+          <li>Solo primer piso</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta" id="contacto">
+    <div class="cta-text">
+      <h2>¿Tienes un local así?</h2>
+      <p>Escríbenos directamente. Respondemos rápido y podemos agendar una visita en pocos días.</p>
+    </div>
+    <div class="cta-actions">
+      <div class="contact-line"><strong>Mauro Hermida</strong> · Expansión Fithub</div>
+      <div class="contact-line">+57 301 544 7307 · mhermida@fithub.com.co</div>
+      <button class="whatsapp-btn" onclick="abrirWhatsapp()">Escribir por WhatsApp</button>
+    </div>
+  </div>
+
+  <footer>Fithub — comida saludable premium · Expansión Bogotá</footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  function abrirWhatsapp(){
+    const mensaje = "Hola, tengo un local comercial que podría interesarle a Fithub. Me gustaría dar más información.";
+    window.open(`https://wa.me/573015447307?text=${encodeURIComponent(mensaje)}`, '_blank');
+  }
+
+  const map = L.map('map', { scrollWheelZoom: false }).setView([4.696, -74.042], 13.2);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Polígono: Calle 82 – Calle 120, entre Carrera 11 y Carrera 19
+  const zonaBusqueda = [
+    [4.6658, -74.0527], // Calle 82 x Carrera 11
+    [4.6687, -74.0586], // Calle 82 x Carrera 19
+    [4.7006, -74.0495], // Calle 120 x Carrera 19
+    [4.6986, -74.0353]  // Calle 120 x Carrera 11
+  ];
+  L.polygon(zonaBusqueda, {
+    color:'#C99A3C',
+    weight:2,
+    fillColor:'#C99A3C',
+    fillOpacity:0.12
+  }).addTo(map).bindPopup('<strong>Zona de búsqueda</strong><br>Calle 82 a Calle 120, entre Carrera 11 y Carrera 19');
+
+  const barrioIcon = L.divIcon({
+    className:'',
+    html:'<div style="width:14px;height:14px;border-radius:50%;background:#E1602C;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.35);"></div>',
+    iconSize:[14,14],
+    iconAnchor:[7,7]
+  });
+  const storeIcon = L.divIcon({
+    className:'',
+    html:'<div style="width:22px;height:22px;border-radius:5px;background:#1F3B2C;border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:#fff;font-family:Inter,sans-serif;font-weight:700;font-size:10px;">F</div>',
+    iconSize:[22,22],
+    iconAnchor:[11,11]
+  });
+
+  const barrios = [
+    { name:'Zona T', lat:4.6676, lng:-74.0541, rango:'Cl. 82–85, Cra. 11–13', desc:'Alto flujo peatonal, epicentro gastronómico' },
+    { name:'El Nogal', lat:4.6631, lng:-74.0528, rango:'Cl. 79–85, Cra. 11–15', desc:'Residencial consolidado, alto poder adquisitivo' },
+    { name:'Antiguo Country', lat:4.6700, lng:-74.0579, rango:'Cl. 85–94, Cra. 15–19', desc:'Residencial exclusivo, cerca a oficinas y clubes' },
+    { name:'La Cabrera', lat:4.6673, lng:-74.0491, rango:'Cl. 85–94, Cra. 11–15', desc:'Corredor comercial boutique, buen tráfico peatonal' },
+    { name:'Chicó', lat:4.6794, lng:-74.0505, rango:'Cl. 90–97, Cra. 7–15', desc:'Corredor empresarial y retail premium' },
+    { name:'Chicó Norte', lat:4.6812, lng:-74.0472, rango:'Cl. 97–100, Cra. 11–15', desc:'Extensión del Chicó, oficinas y locales boutique' },
+    { name:'Santa Paula', lat:4.6931, lng:-74.0429, rango:'Cl. 100–108, Cra. 11–15', desc:'Residencial-comercial consolidado, cerca a clínicas y oficinas' },
+    { name:'Santa Ana Occidental', lat:4.6901, lng:-74.0366, rango:'Cl. 108–116, Cra. 11–15', desc:'Mixto residencial-comercial, en crecimiento' },
+    { name:'San Patricio', lat:4.6923, lng:-74.0491, rango:'Cl. 116–119, Cra. 15–19', desc:'Residencial tranquilo, cerca a colegios' },
+    { name:'Santa Bárbara', lat:4.6988, lng:-74.0322, rango:'Cl. 116–120, Cra. 7–15', desc:'Vía arteria, alta visibilidad' }
+  ];
+  barrios.forEach(b=>{
+    L.marker([b.lat,b.lng], {icon:barrioIcon}).addTo(map)
+      .bindPopup(`<strong>${b.name}</strong><br>${b.rango}<br>${b.desc}`);
+  });
+
+  // Tiendas Fithub activas en Bogotá
+  const tiendas = [
+    { name:'STF 93 · Parque 93', lat:4.6759, lng:-74.0474, desc:'Cl. 93A #11-46, Chapinero' },
+    { name:'STF 15 · Usaquén', lat:4.6975, lng:-74.0429, desc:'Cra. 15 #118-16, Usaquén' },
+    { name:'STF 82 · CC El Retiro', lat:4.6660, lng:-74.0538, desc:'Cl. 82 #11-75, Chapinero' }
+  ];
+  tiendas.forEach(t=>{
+    L.marker([t.lat,t.lng], {icon:storeIcon}).addTo(map)
+      .bindPopup(`<strong>${t.name}</strong><br>${t.desc}`);
+  });
+</script>
+</body>
+</html>
