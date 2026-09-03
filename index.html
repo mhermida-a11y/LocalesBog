@@ -320,8 +320,8 @@
   </header>
 
   <div class="hero">
-    <h1>Buscamos un local <em>en Bogotá</em></h1>
-    <p>Fithub, supermercado premium de comida saludable, está en expansión. Si administras o conoces un local en esta zona que encaje con lo que buscamos, queremos hablar contigo — la decisión la tomamos en máximo 48 horas.</p>
+    <h1>Buscamos locales <em>en Bogotá</em></h1>
+    <p>Fithub, mercado saludable con más de 10 años de trayectoria en Colombia, está en expansión. Si administras o conoces un local en esta zona que encaje con lo que buscamos, queremos hablar contigo.</p>
   </div>
 
   <div class="specs">
@@ -339,7 +339,7 @@
     </div>
     <div id="map"></div>
     <div class="map-legend">
-      <div class="item"><span class="swatch" style="background:#C99A3C;"></span> Zona de búsqueda (Cl. 82 – Cl. 120, Cra. 11 – Cra. 19)</div>
+      <div class="item"><span class="swatch" style="background:#C99A3C;"></span> Zona de búsqueda (Cl. 82 – Cl. 120, Cra. 7 – Cra. 19)</div>
       <div class="item"><span class="swatch" style="background:#E1602C;border-radius:50%;"></span> Barrio de interés</div>
       <div class="item"><span class="swatch" style="background:#1F3B2C;border-radius:2px;"></span> Tienda Fithub activa</div>
     </div>
@@ -425,19 +425,19 @@
     maxZoom: 19
   }).addTo(map);
 
-  // Polígono: Calle 82 – Calle 120, entre Carrera 11 y Carrera 19
+  // Polígono: Calle 82 – Calle 120, entre Carrera 7 y Carrera 19
   const zonaBusqueda = [
-    [4.6658, -74.0527], // Calle 82 x Carrera 11
+    [4.6629, -74.0488], // Calle 82 x Carrera 7
     [4.6687, -74.0586], // Calle 82 x Carrera 19
     [4.7006, -74.0495], // Calle 120 x Carrera 19
-    [4.6986, -74.0353]  // Calle 120 x Carrera 11
+    [4.6968, -74.0315]  // Calle 120 x Carrera 7
   ];
   const zonaPoly = L.polygon(zonaBusqueda, {
     color:'#C99A3C',
     weight:2,
     fillColor:'#C99A3C',
     fillOpacity:0.12
-  }).addTo(map).bindPopup('<strong>Zona de búsqueda</strong><br>Calle 82 a Calle 120, entre Carrera 11 y Carrera 19');
+  }).addTo(map).bindPopup('<strong>Zona de búsqueda</strong><br>Calle 82 a Calle 120, entre Carrera 7 y Carrera 19');
 
   // Encuadra y da zoom ajustado al polígono, para ver calles y carreras con detalle
   map.fitBounds(zonaPoly.getBounds(), { padding: [26, 26] });
