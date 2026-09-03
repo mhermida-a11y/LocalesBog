@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fithub busca local — Norte de Bogotá</title>
+<title>Fithub busca local — Bogotá</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -320,7 +320,7 @@
   </header>
 
   <div class="hero">
-    <h1>Buscamos un local <em>en el norte de Bogotá</em></h1>
+    <h1>Buscamos un local <em>en Bogotá</em></h1>
     <p>Fithub, supermercado premium de comida saludable, está en expansión. Si administras o conoces un local en esta zona que encaje con lo que buscamos, queremos hablar contigo — la decisión la tomamos en máximo 48 horas.</p>
   </div>
 
@@ -343,7 +343,7 @@
       <div class="item"><span class="swatch" style="background:#E1602C;border-radius:50%;"></span> Barrio de interés</div>
       <div class="item"><span class="swatch" style="background:#1F3B2C;border-radius:2px;"></span> Tienda Fithub activa</div>
     </div>
-    <p class="map-note">Zoom y desplázate libremente sobre el mapa — cada marcador tiene el detalle del sector o de la tienda.</p>
+    <p class="map-note">Zoom y desplázate libremente sobre el mapa — haz clic en una tienda (🟩) para ver fotos del local.</p>
   </div>
 
   <div class="section" style="padding-top:0;">
@@ -418,7 +418,7 @@
     window.open(`https://wa.me/573015447307?text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 
-  const map = L.map('map', { scrollWheelZoom: false }).setView([4.696, -74.042], 13.2);
+  const map = L.map('map', { scrollWheelZoom: false });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap &copy; CARTO',
@@ -432,12 +432,15 @@
     [4.7006, -74.0495], // Calle 120 x Carrera 19
     [4.6986, -74.0353]  // Calle 120 x Carrera 11
   ];
-  L.polygon(zonaBusqueda, {
+  const zonaPoly = L.polygon(zonaBusqueda, {
     color:'#C99A3C',
     weight:2,
     fillColor:'#C99A3C',
     fillOpacity:0.12
   }).addTo(map).bindPopup('<strong>Zona de búsqueda</strong><br>Calle 82 a Calle 120, entre Carrera 11 y Carrera 19');
+
+  // Encuadra y da zoom ajustado al polígono, para ver calles y carreras con detalle
+  map.fitBounds(zonaPoly.getBounds(), { padding: [26, 26] });
 
   const barrioIcon = L.divIcon({
     className:'',
@@ -447,9 +450,9 @@
   });
   const storeIcon = L.divIcon({
     className:'',
-    html:'<div style="width:22px;height:22px;border-radius:5px;background:#1F3B2C;border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:#fff;font-family:Inter,sans-serif;font-weight:700;font-size:10px;">F</div>',
-    iconSize:[22,22],
-    iconAnchor:[11,11]
+    html:'<div style="width:38px;height:38px;border-radius:11px;background:#1F3B2C;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;color:#fff;font-family:Inter,sans-serif;font-weight:800;font-size:16px;">F</div>',
+    iconSize:[38,38],
+    iconAnchor:[19,19]
   });
 
   const barrios = [
@@ -471,13 +474,13 @@
 
   // Tiendas Fithub activas en Bogotá
   const tiendas = [
-    { name:'STF 93 · Parque 93', lat:4.6759, lng:-74.0474, desc:'Cl. 93A #11-46, Chapinero' },
-    { name:'STF 15 · Usaquén', lat:4.6975, lng:-74.0429, desc:'Cra. 15 #118-16, Usaquén' },
-    { name:'STF 82 · CC El Retiro', lat:4.6660, lng:-74.0538, desc:'Cl. 82 #11-75, Chapinero' }
+    { name:'STF 93 · Parque 93', lat:4.6759, lng:-74.0474, desc:'Cl. 93A #11-46, Chapinero', fotos:'https://www.google.com/search?q=fithub+parque+de+la+93' },
+    { name:'STF 15 · Usaquén', lat:4.6975, lng:-74.0429, desc:'Cra. 15 #118-16, Usaquén', fotos:'https://www.google.com/search?q=fithub+usaquen' },
+    { name:'STF 82 · CC El Retiro', lat:4.6660, lng:-74.0538, desc:'Cl. 82 #11-75, Chapinero', fotos:'https://www.google.com/search?q=fithub+cc+el+retiro+bogota' }
   ];
   tiendas.forEach(t=>{
     L.marker([t.lat,t.lng], {icon:storeIcon}).addTo(map)
-      .bindPopup(`<strong>${t.name}</strong><br>${t.desc}`);
+      .bindPopup(`<strong>${t.name}</strong><br>${t.desc}<br><a href="${t.fotos}" target="_blank" rel="noopener" style="color:#E1602C;font-weight:600;">Ver fotos de la tienda →</a>`);
   });
 </script>
 </body>
